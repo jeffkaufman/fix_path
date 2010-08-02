@@ -1,0 +1,63 @@
+Usage:
+
+  Once this is set up, environment variables will automatically
+  reverse-resolve in your prompt.  Running fix_path with no arguments
+  will either give you the current directory or an expression
+  containing enviroment variables that when evaluated gives you the
+  current directory
+
+Installation:
+
+  $ gcc -o fix_path fix_path.c
+  $ cp fix_path somewhere_on_your_path/
+
+  Then open your .bashrc and add:
+
+  PS1="\u@\h \$(fix_path) $ "
+
+  Reload bash.  Then to test this do something like:
+    user@host ~ $ cd /tmp
+    user@host /tmp $ export A="/tmp"
+    user@host $A $
+  
+  If this is not the result you get, with $A substituted for /tmp in
+  the last line, then something is wrong.  If you are pretty sure this
+  is my fault, email me: cbr at sccs dot swarthmore dot edu
+
+Known Issues:
+
+  Some ways of configuring systems make getcwd() give annoying answers
+  for home directories.  For example, on one system I use, my homedir
+  looks like /home/jeff normally, but getcwd() yields
+  /local/home/jeff.  This is a unix limitation.  Plan 9 fixes this,
+  but has not been widely adopted.  The solution here is to hack the
+  fix_home function to ignore some number of characters under certain
+  circumstances.  I'd change:
+
+    int fix_home(char* in_path)
+    {
+      if (starts_with(in_path, "/d4m/home/"))
+        return sizeof("/d4m") - 1;
+      if (starts_with(in_path, "/nfs/emc5/home/"))
+        return sizeof("/nfs/emc5") - 1;
+      return 0;
+    }
+
+  to:
+
+    int fix_home(char* in_path)
+    {
+      if (starts_with(in_path, "/d4m/home/"))
+         return sizeof("/d4m") - 1;
+      if (starts_with(in_path, "/nfs/emc5/home/"))
+         return sizeof("/nfs/emc5") - 1;
+      if (starts_with(in_path, "/local/home/"))
+         return sizeof("/local/home") -1;
+      return 0;
+    }
+
+   to deal with the problem that /home/jeff is actually /local/home/jeff
+
+
+
+   

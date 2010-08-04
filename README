@@ -6,6 +6,10 @@ Usage:
   containing enviroment variables that when evaluated gives you the
   current directory
 
+License:
+
+  GPL v2 or later.  See the included file COPYING.
+
 Installation:
 
   $ gcc -o fix_path fix_path.c
